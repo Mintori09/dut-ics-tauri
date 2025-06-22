@@ -1,0 +1,22 @@
+/* Styles for DownloadButton */
+
+.button {
+  padding: 10px 15px;
+  background-color: #34c759;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.button:hover {
+  background-color: #2ea14b;
+}
+
+.button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

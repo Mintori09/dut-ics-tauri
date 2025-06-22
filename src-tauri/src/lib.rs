@@ -1,6 +1,9 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod cli;
+mod video;
 use crate::cli::{parse_courses_from_lines, Course, PrintTerminal};
+use crate::video::read_video::duration_videos;
+
 #[tauri::command]
 fn read_markdown_file(path: &str) -> Result<String, String> {
     std::fs::read_to_string(path).map_err(|e| e.to_string())
@@ -44,7 +47,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             handle_schedule,
             read_markdown_file,
-            from_markdown_to_ics
+            from_markdown_to_ics,
+            duration_videos
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,0 +1,20 @@
+.layout {
+  display: flex;
+  /* Use flexbox for flexible layout */
+  height: 100vh;
+  /* Full viewport height */
+}
+
+.mainContent {
+  /* Styles for the main content area */
+  flex-grow: 1;
+  /* Add scroll if content overflows */
+  flex: 1;
+  /* Allow main content to take up remaining space */
+  padding: 20px;
+  /* Example padding */
+  overflow-y: auto;
+  padding: 1rem;
+  background: #ecf0f1;
+  overflow: auto;
+}
