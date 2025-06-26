@@ -1,7 +1,10 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod cli;
+mod config;
 mod video;
-use crate::cli::{parse_courses_from_lines, Course, PrintTerminal};
+use config::config_env::set_env_backend;
+
+use crate::cli::{Course, PrintTerminal, parse_courses_from_lines};
 use crate::video::read_video::duration_videos;
 
 #[tauri::command]
@@ -41,6 +44,7 @@ async fn from_markdown_to_ics(data: String, output_path: String) -> Result<(), S
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    set_env_backend().unwrap();
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())

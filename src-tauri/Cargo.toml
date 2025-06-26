@@ -1,9 +1,9 @@
 [package]
-name = "calendar"
+name = "mintori"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
-edition = "2021"
+authors = ["mintori"]
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -30,4 +30,4 @@ chrono-tz = "0.10.3"
 regex = "1.11.1"
 icalendar = "0.16.13"
 anyhow = "1.0.98"
-
+dotenv = "0.15.0"

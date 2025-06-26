@@ -1,9 +1,12 @@
 import HomePage from "../features/home/HomePage";
 import { RouteType } from "./config";
-import { HomeOutlined } from "@mui/icons-material";
+import { HomeOutlined, VideocamOutlined } from "@mui/icons-material";
 import { IcsCalendarPage } from "../features/calendar/IcsCalendarPage";
 import DutLayout from "../components/layout/DutLayout";
 import DutDefault from "../pages/Dut/DutDefault";
+import VideoDuration from "../pages/Video/pages/VideoDuration";
+import { TempleBuddhistOutlined } from "@mui/icons-material";
+import TestPage from "../pages/test/TestPage";
 
 const mainLayout: RouteType[] = [
     {
@@ -39,6 +42,24 @@ const mainLayout: RouteType[] = [
             }
         ],
     },
+    {
+        element: <VideoDuration />,
+        state: "video",
+        path: "/video/duration",
+        props: {
+            displayText: "Video Duration",
+            icon: <VideocamOutlined />
+        }
+    },
+    {
+        element: <TestPage />,
+        state: "testpage",
+        path: "test",
+        props: {
+            displayText: "TestPage",
+            icon: <TempleBuddhistOutlined />
+        }
+    }
 ];
 
 export { mainLayout };
