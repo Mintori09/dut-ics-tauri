@@ -8,7 +8,6 @@ import {
     Tooltip
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { useState } from "react";
 import sizeConfigs from "../../configs/sizeConfigs";
 import assets from "../../assets";
 import colorConfigs from "../../configs/colorConfigs";
@@ -16,8 +15,12 @@ import { mainLayout } from "../../routes/appRoutes";
 import SidebarItem from "./SidebarItem";
 import SidebarItemCollapse from "./SidebarItemCollapse";
 
-const Sidebar = () => {
-    const [collapsed, setCollapsed] = useState(false);
+type Props = {
+    collapsed: boolean,
+    setCollapsed: (value: boolean | ((prev: boolean) => boolean)) => void
+}
+
+const Sidebar = ({ collapsed, setCollapsed }: Props) => {
 
     return (
         <Drawer
