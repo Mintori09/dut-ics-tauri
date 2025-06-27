@@ -33,7 +33,7 @@ pub async fn duration_videos(video_paths: Vec<String>) -> Result<Vec<VideoDurati
 /// Gọi ffprobe và trả về thời lượng video (giây)
 fn get_video_duration(video_path: &str) -> Result<f64, String> {
     let mut child = Command::new("ffprobe")
-        .args(&[
+        .args([
             "-v",
             "error",
             "-show_entries",
@@ -77,14 +77,3 @@ fn get_video_duration(video_path: &str) -> Result<f64, String> {
         .parse::<f64>()
         .map_err(|e| format!("Failed to parse duration: {}", e))
 }
-
-// In thời lượng video dưới dạng HH:MM:SS và tổng giây
-// fn display_duration(duration: f64) {
-//     let hours = (duration / 3600.0) as u64;
-//     let minutes = ((duration % 3600.0) / 60.0) as u64;
-//     let seconds = duration % 60.0;
-//
-//     println!("Video Duration:");
-//     println!("  Total seconds: {:.3}", duration);
-//     println!("  HH:MM:SS: {:02}:{:02}:{:05.2}", hours, minutes, seconds);
-// }

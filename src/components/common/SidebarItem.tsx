@@ -19,7 +19,6 @@ const SidebarItem = ({ item }: Props) => {
                 sx={{
                     display: "flex",
                     mx: "5%",
-                    justifyContent: "center",
                     borderRadius: "8px",
                     backgroundColor: appState === item.state
                         ? colorConfigs.sidebar.activeBg

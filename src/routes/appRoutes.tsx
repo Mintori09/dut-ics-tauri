@@ -1,12 +1,11 @@
 import HomePage from "../features/home/HomePage";
 import { RouteType } from "./config";
-import { HomeOutlined, VideocamOutlined } from "@mui/icons-material";
+import { HomeOutlined, Translate, VideocamOutlined } from "@mui/icons-material";
 import { IcsCalendarPage } from "../features/calendar/IcsCalendarPage";
 import DutLayout from "../components/layout/DutLayout";
 import DutDefault from "../pages/Dut/DutDefault";
 import VideoDuration from "../pages/Video/pages/VideoDuration";
-import { TempleBuddhistOutlined } from "@mui/icons-material";
-import TestPage from "../pages/test/TestPage";
+import TranslateFilePage from "../pages/Translate/pages/TranslateFilePage";
 
 const mainLayout: RouteType[] = [
     {
@@ -52,14 +51,14 @@ const mainLayout: RouteType[] = [
         }
     },
     {
-        element: <TestPage />,
-        state: "testpage",
-        path: "test",
+        element: < TranslateFilePage />,
+        state: "translate.file",
+        path: "/transale",
         props: {
-            displayText: "TestPage",
-            icon: <TempleBuddhistOutlined />
+            displayText: "Translate",
+            icon: <Translate />
         }
-    }
+    },
 ];
 
 export { mainLayout };

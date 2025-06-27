@@ -38,8 +38,9 @@ const SidebarItemCollapse = ({ item }: Props) => {
                         },
                         // paddingY: "12px",
                         paddingX: "24px",
+                        display: "flex",
                         transition: "background-color 0.2s ease-in-out, transform 0.2s ease-in-out",
-                        borderRadius: "15px",
+                        borderRadius: "8px",
                     }}
 
                 >

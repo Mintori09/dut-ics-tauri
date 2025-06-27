@@ -93,7 +93,7 @@ pub async fn parse_courses(input: &str) -> Result<Vec<Course>, String> {
         // course_name: gồm nhiều từ, dừng khi gặp token là số (credit)
         let mut course_name_words = Vec::new();
         while i < tokens.len() {
-            if let Ok(_) = tokens[i].parse::<u8>() {
+            if tokens[i].parse::<u8>().is_ok() {
                 // credit bắt đầu
                 break;
             }
@@ -131,7 +131,7 @@ pub async fn parse_courses(input: &str) -> Result<Vec<Course>, String> {
         while i < tokens.len() {
             // Dừng khi gặp tuần học (dạng số hoặc dạng 49-52)
             let token = tokens[i];
-            if token.chars().all(|c| c.is_digit(10) || c == '-') {
+            if token.chars().all(|c| c.is_ascii_digit() || c == '-') {
                 break;
             }
             schedule_words.push(token);
@@ -162,7 +162,7 @@ pub async fn parse_courses(input: &str) -> Result<Vec<Course>, String> {
 
         // registered (ví dụ: "89/90")
         let registered = tokens.get(i).unwrap_or(&"").to_string();
-        if registered != "" {
+        if !registered.is_empty() {
             i += 1;
         }
 

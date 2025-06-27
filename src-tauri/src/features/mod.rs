@@ -1,2 +1,2 @@
 pub mod convert;
-pub mod translate;
+pub mod translates;
