@@ -76,7 +76,12 @@ export function useTranslator() {
     setCompletedCount(0);
     setLoading(true);
     try {
-      const inputs: TranslateInput[] = files.map((f) => f.translate_input);
+      const inputs: TranslateInput[] = files.map((f) => ({
+        ...f.translate_input,
+        from: fromLang,
+        to: toLang,
+      }));
+      console.log(inputs);
       await invoke("translate_stream_command", {
         batch: inputs,
       });

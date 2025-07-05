@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    if let Err(_e) = mintori::cli::run::cli() {
+    if let Err(_e) = mintori::cli::cli() {
         std::process::exit(1);
     }
 

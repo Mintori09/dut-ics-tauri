@@ -2326,6 +2326,7 @@ dependencies = [
  "chrono-tz",
  "clap",
  "comfy-table",
+ "dirs",
  "dotenv",
  "futures",
  "icalendar",
