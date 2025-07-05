@@ -2,5 +2,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    calendar_lib::run()
+    if let Err(_e) = mintori::cli::run::cli() {
+        std::process::exit(1);
+    }
+
+    mintori::run()
 }

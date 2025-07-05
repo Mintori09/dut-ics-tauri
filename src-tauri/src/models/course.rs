@@ -194,9 +194,26 @@ pub async fn parse_courses(input: &str) -> Result<Vec<Course>, String> {
 pub async fn parse_courses_from_lines(input: &str) -> Result<Vec<Course>, String> {
     let mut lines = input.lines();
 
-    let _header = lines.next().ok_or("Input is empty")?;
+    // Lấy dòng đầu tiên để kiểm tra có phải header không
+    let first_line = lines.next().ok_or("Input is empty")?;
 
-    let data = lines.collect::<Vec<_>>().join(" ");
+    // Nếu chứa một trong các từ khóa phổ biến của header → bỏ qua
+    let is_header = first_line.contains("TT")
+        || first_line.contains("Mã lớp")
+        || first_line.contains("Tên lớp")
+        || first_line.contains("Số TC")
+        || first_line.contains("Giảng viên");
+
+    // Ghép lại toàn bộ phần còn lại
+    let data = if is_header {
+        lines.collect::<Vec<_>>().join(" ")
+    } else {
+        // Nếu không có header, vẫn cần dùng dòng đầu
+        std::iter::once(first_line)
+            .chain(lines)
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
 
     parse_courses(&data).await
 }

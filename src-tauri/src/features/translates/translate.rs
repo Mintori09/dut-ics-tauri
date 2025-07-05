@@ -41,38 +41,54 @@ fn detect_file_extension(filename: &str) -> FileType {
     }
 }
 
-async fn translate_lines(lines: impl Iterator<Item = String>, from: &str, to: &str) -> Vec<String> {
-    let mut translated = Vec::new();
-
-    for line in lines {
-        if line.trim().is_empty() {
-            translated.push(String::new());
-            continue;
-        }
-
-        match translate(&line, from, to).await {
-            Ok(t) => translated.push(t),
-            Err(e) => {
-                eprintln!("❌ Lỗi dịch dòng: {}\n   → {}", line, e);
-                translated.push(line);
-            }
-        }
-    }
-
-    translated
-}
-
-async fn translate_text_file(
+pub async fn translate_text_file(
     input_path: &str,
     output_path: &str,
     from: &str,
     to: &str,
 ) -> Result<(), String> {
     let input = fs::read_to_string(input_path).map_err(|e| e.to_string())?;
-    let lines = input.lines().map(|s| s.to_string());
+    let lines: Vec<String> = input.lines().map(|s| s.to_string()).collect();
 
-    let translated = translate_lines(lines, from, to).await;
-    fs::write(output_path, translated.join("\n"))
+    let semaphore = Arc::new(Semaphore::new(5));
+    let mut tasks = Vec::new();
+
+    for line in lines.iter().cloned() {
+        let permit = semaphore.clone().acquire_owned().await.unwrap();
+        let from = from.to_string();
+        let to = to.to_string();
+
+        let task = tokio::spawn(async move {
+            let _permit = permit;
+            if line.trim().is_empty() {
+                return Some(String::new());
+            }
+            match translate(&line, &from, &to).await {
+                Ok(t) => {
+                    println!("{}", t);
+                    Some(t)
+                }
+                Err(e) => {
+                    eprintln!("❌ Dịch lỗi: {}\n   → {}", line, e);
+                    Some(line)
+                }
+            }
+        });
+        tasks.push(task);
+    }
+
+    let results = join_all(tasks).await;
+    let mut translated_text = Vec::new();
+
+    for result in results {
+        if let Ok(Some(translated)) = result {
+            translated_text.push(translated);
+        } else {
+            translated_text.push(String::from("")); // fallback nếu panic hoặc lỗi khác
+        }
+    }
+
+    fs::write(output_path, translated_text.join("\n"))
         .map_err(|e| format!("❌ Không thể ghi file: {}", e))?;
 
     Ok(())
@@ -104,12 +120,15 @@ pub async fn translate_srt_file(
             let _permit = permit;
 
             match translate(&text, &from, &to).await {
-                Ok(translated) => Some(Subtitle {
-                    num,
-                    start_time: start,
-                    end_time: end,
-                    text: translated,
-                }),
+                Ok(translated) => {
+                    println!("{}", translated);
+                    Some(Subtitle {
+                        num,
+                        start_time: start,
+                        end_time: end,
+                        text: translated,
+                    })
+                }
                 Err(e) => {
                     eprintln!("❌ Dịch lỗi ở block #{}: {}", num, e);
                     None
@@ -160,11 +179,6 @@ async fn translate_file(
 #[tauri::command]
 pub async fn translate_command(props: TranslateInput) -> Result<String, String> {
     translate_file(props.input_path, props.output_path, props.from, props.to).await
-}
-
-#[derive(Debug, Deserialize)]
-pub struct BatchTranslateInput {
-    pub files: Vec<TranslateInput>,
 }
 
 #[tauri::command]

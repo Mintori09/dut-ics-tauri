@@ -1,9 +1,12 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+pub mod cli;
 mod config;
 mod features;
 mod models;
 mod utils;
 mod video;
+use std::env;
+
 use crate::features::translates::translate::{translate_command, translate_stream_command};
 use crate::video::read_video::duration_videos;
 use config::config_env::set_env_backend;
