@@ -1,12 +1,12 @@
 pub mod command;
-pub mod create;
+pub mod features;
 pub mod models;
 pub mod utils;
 
 use anyhow::{Result, anyhow};
 use clap::Parser;
 use command::Cli;
-use create::cli_create;
+use features::create::cli_create;
 use std::env;
 
 pub fn cli() -> Result<()> {
@@ -17,11 +17,12 @@ pub fn cli() -> Result<()> {
     }
 
     if let Some(file) = args.create {
-        if let Ok(()) = cli_create(&file) {
-            println!("Run successfully!");
-        } else {
-            println!("Error : file not exist!");
-        };
+        match cli_create(&file) {
+            Ok(()) => {
+                println!("Run successfully!");
+            }
+            Err(e) => println!("{}", e),
+        }
         std::process::exit(1)
     } else {
         Err(anyhow!(

@@ -3,14 +3,20 @@ use std::{
     process::Command,
 };
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 
 use crate::cli::{models::CommandType, utils::get_folder};
 
 pub fn cli_create(file: &str) -> Result<()> {
     let script_path = get_folder(CommandType::Create)?.join(format!("{}.sh", file));
+    if !script_path.exists() {
+        return Err(anyhow!(
+            "Script file '{}' does not exist",
+            script_path.display()
+        ));
+    }
 
-    print!("Project name \x1b[90m(default: my-react-app)\x1b[0m :");
+    print!("Project name \x1b[90m(default: my-react-app)\x1b[0m: ");
     io::stdout().flush()?;
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
@@ -18,7 +24,9 @@ pub fn cli_create(file: &str) -> Result<()> {
 
     let status = Command::new("sh")
         .arg(&script_path)
-        .arg(project_name)
+        .arg(&project_name)
+        .arg("&& cd")
+        .arg(&project_name)
         .status()?;
 
     if !status.success() {
