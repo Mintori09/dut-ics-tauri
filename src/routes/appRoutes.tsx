@@ -6,6 +6,7 @@ import DutLayout from "../components/layout/DutLayout";
 import DutDefault from "../pages/Dut/DutDefault";
 import VideoDuration from "../pages/Video/pages/VideoDuration";
 import TranslateFilePage from "../pages/Translate/pages/TranslateFilePage";
+import ScorePage from "../pages/Dut/ScorePage";
 
 const mainLayout: RouteType[] = [
     {
@@ -37,6 +38,14 @@ const mainLayout: RouteType[] = [
                 state: "dut.calendar",
                 props: {
                     displayText: "Extract Calendar",
+                }
+            },
+            {
+                element: <ScorePage />,
+                path: "/dut/score",
+                state: "dut.score",
+                props: {
+                    displayText: "Score"
                 }
             }
         ],
