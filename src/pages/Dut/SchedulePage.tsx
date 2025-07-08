@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
 import { useEffect, useState } from "react";
 
-export default function ScorePage() {
+export default function SchedulePage() {
     const [html, setHtml] = useState<string>("");
 
     const init = async () => {
@@ -13,7 +13,7 @@ export default function ScorePage() {
             const json = JSON.parse(fileContent);
             const cookie = json.DutCookie ?? "";
 
-            const html = await invoke<string>("fetch_dut", {
+            const html = await invoke<string>("fetch_schedule", {
                 cookie: cookie,
             });
 
@@ -58,8 +58,8 @@ export default function ScorePage() {
 
     return (
         <div style={{ padding: "1rem", fontFamily: "sans-serif" }}>
-            <h1>Score</h1>
 
+            <h1>Schedule</h1>
             <div style={{ display: "flex" }}>
                 <button onClick={init} style={{ marginTop: "1rem" }}>
                     Reload

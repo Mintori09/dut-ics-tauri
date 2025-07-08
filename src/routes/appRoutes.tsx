@@ -7,6 +7,7 @@ import DutDefault from "../pages/Dut/DutDefault";
 import VideoDuration from "../pages/Video/pages/VideoDuration";
 import TranslateFilePage from "../pages/Translate/pages/TranslateFilePage";
 import ScorePage from "../pages/Dut/ScorePage";
+import SchedulePage from "../pages/Dut/SchedulePage";
 
 const mainLayout: RouteType[] = [
     {
@@ -46,6 +47,14 @@ const mainLayout: RouteType[] = [
                 state: "dut.score",
                 props: {
                     displayText: "Score"
+                }
+            },
+            {
+                element: <SchedulePage />,
+                path: "/dut/schedule",
+                state: "dut.schedule",
+                props: {
+                    displayText: "Schedule"
                 }
             }
         ],

@@ -47,6 +47,41 @@ pub async fn fetch_dut(cookie: String) -> Result<String, String> {
     Ok(text)
 }
 
+#[tauri::command]
+pub async fn fetch_schedule(cookie: String) -> Result<String, String> {
+    use reqwest::header::{ACCEPT, COOKIE, HeaderMap, HeaderValue, REFERER, USER_AGENT};
+
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        COOKIE,
+        HeaderValue::from_str(&cookie).map_err(|e| e.to_string())?,
+    );
+    headers.insert(
+        USER_AGENT,
+        HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64)"),
+    );
+    headers.insert(
+        ACCEPT,
+        HeaderValue::from_static("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+    );
+    headers.insert(REFERER, HeaderValue::from_static("https://sv.dut.udn.vn/"));
+
+    let client = Client::builder()
+        .default_headers(headers)
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let res = client
+        .get("https://sv.dut.udn.vn/PageLichTH.aspx")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let text = res.text().await.map_err(|e| e.to_string())?;
+    Ok(text)
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 struct ConfigJson {
     DutCookie: String,
