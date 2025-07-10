@@ -1,0 +1,67 @@
+/* schedule.css */
+
+/* Box chứa mỗi bảng */
+.GreyBox {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin-top: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+/* Tiêu đề hộp */
+.GreyBoxCaption {
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+/* Bảng chung */
+table.Grid {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  background-color: white;
+}
+
+/* Header bảng */
+.GridHeader {
+  background-color: #00467f;
+  color: white;
+}
+
+.GridHeaderCell {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Dòng dữ liệu */
+.GridRow {
+  border-bottom: 1px solid #eee;
+  background-color: #fafafa;
+}
+
+.GridRow:hover {
+  background-color: #f0f8ff;
+  cursor: pointer;
+}
+
+/* Ô dữ liệu */
+.GridCell {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+/* Dòng tổng cộng */
+.kctHeader {
+  background-color: #f3f3f3;
+  font-weight: bold;
+  border-top: 2px solid #ccc;
+}

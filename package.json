@@ -15,6 +15,7 @@
     "@mui/icons-material": "^7.1.1",
     "@mui/material": "^7.1.1",
     "@reduxjs/toolkit": "^2.8.2",
+    "@tailwindcss/vite": "^4.1.11",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "~2",
     "@tauri-apps/plugin-fs": "~2.4.0",
@@ -25,7 +26,8 @@
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.2",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

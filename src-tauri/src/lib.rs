@@ -11,7 +11,7 @@ use crate::features::translates::translate::{translate_command, translate_stream
 use crate::video::read_video::duration_videos;
 use config::config_env::set_env_backend;
 use features::convert::ics_calendar::{from_markdown_to_ics, handle_schedule};
-use features::dut_fetch::score::{create_new_cookie, fetch_dut, fetch_schedule};
+use features::dut_fetch::{create_new_cookie, fetch_schedule, fetch_schedule_by_id, fetch_score};
 use utils::read_file::read_markdown_file;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -25,10 +25,11 @@ pub fn run() {
             handle_schedule,
             read_markdown_file,
             translate_stream_command,
+            fetch_schedule_by_id,
             from_markdown_to_ics,
             duration_videos,
             translate_command,
-            fetch_dut,
+            fetch_score,
             create_new_cookie,
             fetch_schedule
         ])

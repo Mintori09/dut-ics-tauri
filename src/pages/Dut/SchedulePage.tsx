@@ -1,78 +1,90 @@
+import "./SchedulePage.css";
 import { invoke } from "@tauri-apps/api/core";
-import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
 import { useEffect, useState } from "react";
+import removeSVMainMenu from "./components/removeElement";
+import Spinner from "../../components/common/Spinner";
+import parseSemesters, { SelectType } from "./hooks/useSemesters"; // Đổi tên nếu không phải hook
+import SemesterList from "./components/SemesterList";
 
 export default function SchedulePage() {
     const [html, setHtml] = useState<string>("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
+    const [semesters, setSemesters] = useState<SelectType[] | undefined>(undefined);
 
-    const init = async () => {
+    const generateCookie = async () => {
         try {
-            const fileContent = await readTextFile(".config/mintori/config.json", {
-                baseDir: BaseDirectory.Home,
-            });
-            const json = JSON.parse(fileContent);
-            const cookie = json.DutCookie ?? "";
-
-            const html = await invoke<string>("fetch_schedule", {
-                cookie: cookie,
-            });
-
-            function removeSVMainMenu(html: string): string {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, "text/html");
-
-                // Xoá phần tử có id="SVMainMenu"
-                const mainMenu = doc.getElementById("SVMainMenu");
-                if (mainMenu) {
-                    mainMenu.remove();
-                }
-
-                // Xoá tất cả phần tử có class="aspNetHidden"
-                const hiddenElements = doc.getElementsByClassName("aspNetHidden");
-                Array.from(hiddenElements).forEach((element) => {
-                    element.remove();
-                });
-
-                const headerElements = doc.getElementsByClassName("pageHeader");
-                Array.from(headerElements).forEach((element) => {
-                    element.remove();
-                });
-
-                return doc.documentElement.outerHTML;
-            }
-
-            setHtml(removeSVMainMenu(html));
+            await invoke("create_new_cookie");
         } catch (err) {
-            console.error("Error:", err);
-            setHtml("<p style='color:red'>❌ Failed to fetch HTML content.</p>");
+            console.error("❌ Failed to generate cookie:", err);
         }
     };
 
-    const generateCookie = async () => {
-        await invoke("create_new_cookie")
-    }
+    const init = async () => {
+        try {
+            setIsLoading(true);
+            const htmlRaw = await invoke<string>("fetch_schedule");
+
+            const parsedSemesters = parseSemesters(htmlRaw);
+            setSemesters(parsedSemesters);
+
+            const cleanHtml = removeSVMainMenu(htmlRaw);
+            setHtml(cleanHtml);
+            setRetryCount(0);
+        } catch (err) {
+            if (retryCount < 1) {
+                console.warn("⚠️ Retry due to error:", err);
+                setRetryCount((prev) => prev + 1);
+                await generateCookie();
+                await init();
+            } else {
+                console.error("❌ Failed after retry:", err);
+                setHtml("<p style='color:red'>❌ Failed to fetch HTML content after retry.</p>");
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const fetchScheduleById = async (id: string) => {
+        try {
+            setIsLoading(true);
+            const htmlRaw = await invoke<string>("fetch_schedule_by_id", { id });
+            const cleanHtml = removeSVMainMenu(htmlRaw);
+            setHtml(cleanHtml);
+        } catch (error) {
+            console.error("❌ Failed to fetch schedule by ID:", error);
+            setHtml("<p style='color:red'>❌ Failed to fetch schedule for selected semester.</p>");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         init();
     }, []);
 
+    useEffect(() => {
+        const selected = semesters?.find((s) => s.selected);
+        if (selected?.value) {
+            fetchScheduleById(selected.value);
+        }
+    }, [semesters]);
+
     return (
         <div style={{ padding: "1rem", fontFamily: "sans-serif" }}>
-
-            <h1>Schedule</h1>
-            <div style={{ display: "flex" }}>
-                <button onClick={init} style={{ marginTop: "1rem" }}>
-                    Reload
-                </button>
-                <button onClick={generateCookie} style={{ marginTop: "1rem" }}>
-                    Generate Cookie
-                </button>
-            </div>
-            <div
-                style={{ border: "1px solid #ccc", padding: "1rem", marginTop: "1rem" }}
-                dangerouslySetInnerHTML={{ __html: html }}
-            />
-
+            <h2 className="font-bold text-2xl">Lịch học, lịch thi cuối kỳ, lịch khảo sát ý kiến</h2>
+            <SemesterList setSemesters={setSemesters} semesters={semesters ?? []} />
+            {isLoading ? (
+                <Spinner />
+            ) : (
+                <div
+                    style={{ border: "1px solid #ccc", padding: "1rem", marginTop: "1rem" }}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                />
+            )}
         </div>
     );
 }
+
+
