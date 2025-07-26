@@ -28,7 +28,7 @@ pub async fn set_cookie() -> Result<(), String> {
     let mut json = config::read_config().await?;
     let cookie = login_and_get_cookie(&json.username, &json.password).await?;
 
-    json.DutCookie = cookie;
+    json.dut_cookie = cookie;
     config::save_config(&json).await?;
     Ok(())
 }

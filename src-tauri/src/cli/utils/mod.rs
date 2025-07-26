@@ -1,3 +1,4 @@
+pub mod hasher;
 use std::path::PathBuf;
 
 use anyhow::{Result, anyhow};

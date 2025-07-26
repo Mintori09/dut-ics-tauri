@@ -3,9 +3,10 @@ use tokio::fs;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ConfigJson {
-    pub DutCookie: String,
+    pub dut_cookie: String,
     pub username: String,
     pub password: String,
+    pub start_date: String,
 }
 
 const CONFIG_PATH: &str = "/home/mintori/.config/mintori/config.json";
@@ -30,9 +31,10 @@ pub async fn save_config(config: &ConfigJson) -> Result<(), String> {
 impl ConfigJson {
     pub async fn init() {
         let config = ConfigJson {
-            DutCookie: "".into(),
+            dut_cookie: "".into(),
             username: "".into(),
             password: "".into(),
+            start_date: "".into(),
         };
 
         save_config(&config)

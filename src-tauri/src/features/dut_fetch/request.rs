@@ -4,10 +4,10 @@ use crate::features::dut_fetch::config::{ConfigJson, read_config};
 
 pub async fn fetch_html(url: String) -> Result<String, String> {
     let cookie = match read_config().await {
-        Ok(config) => config.DutCookie,
+        Ok(config) => config.dut_cookie,
         Err(_) => {
             ConfigJson::init().await;
-            read_config().await?.DutCookie
+            read_config().await?.dut_cookie
         }
     };
 

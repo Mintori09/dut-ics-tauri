@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Parser;
@@ -10,6 +11,8 @@ use super::utils::get_home_dir;
 pub struct Cli {
     #[arg(short, long)]
     pub create: Option<String>,
+    #[arg(short = 'l', long)]
+    pub link: Option<PathBuf>,
 }
 
 impl Cli {

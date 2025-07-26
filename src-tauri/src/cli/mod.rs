@@ -6,27 +6,31 @@ pub mod utils;
 use anyhow::{Result, anyhow};
 use clap::Parser;
 use command::Cli;
-use features::create::cli_create;
+use features::{create::cli_create, rclone::upload_and_get_link};
 use std::env;
 
-pub fn cli() -> Result<()> {
-    Cli::init()?;
+pub async fn cli() -> Result<()> {
+    Cli::init()?; // nếu có
+
     let args = Cli::parse();
-    if env::args_os().len() <= 1 {
-        return Ok(());
+
+    match (args.create, args.link) {
+        (Some(file), None) => {
+            cli_create(&file)?;
+            println!("Run successfully!");
+        }
+        (None, Some(path)) => {
+            upload_and_get_link(&path).await?;
+        }
+        (None, None) => {
+            return Err(anyhow!(
+                "Missing command. Please provide a valid subcommand."
+            ));
+        }
+        (Some(_), Some(_)) => {
+            return Err(anyhow!("Please provide only one subcommand at a time."));
+        }
     }
 
-    if let Some(file) = args.create {
-        match cli_create(&file) {
-            Ok(()) => {
-                println!("Run successfully!");
-            }
-            Err(e) => println!("{}", e),
-        }
-        std::process::exit(1)
-    } else {
-        Err(anyhow!(
-            "Missing command. Please provide a valid subcommand."
-        ))
-    }
+    Ok(())
 }

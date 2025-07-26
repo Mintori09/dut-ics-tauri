@@ -5,8 +5,6 @@ mod tests {
         config::{ConfigJson, read_config},
     };
 
-    use super::*;
-
     #[tokio::test]
     async fn test_login_and_get_cookie_real() {
         let config: ConfigJson = read_config().await.unwrap();
