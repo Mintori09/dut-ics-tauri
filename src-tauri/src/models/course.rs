@@ -122,52 +122,72 @@ async fn export_to_ics(
     let mut calendar = Calendar::new();
     let mut output_path = PathBuf::from(output_path_str);
 
+    // Đọc config (ngày bắt đầu học kỳ)
     let config = read_config().await?;
     let (day, month, year) = parse_date(&config.start_date);
     let academic_year_start_date = NaiveDate::from_ymd_opt(year, month, day).unwrap();
 
+    // Lấy thời gian bắt đầu và kết thúc cho từng tiết học
     let period_start_times: HashMap<u32, NaiveTime> = period_start_times();
     let period_end_times: HashMap<u32, NaiveTime> = period_end_times();
 
     for schedule_item in schedules {
-        for week_num in schedule_item.start_week..=schedule_item.end_week {
-            let days_offset = (week_num - 1) * 7 + (schedule_item.day - 2);
-            let event_date = academic_year_start_date + chrono::Duration::days(days_offset as i64);
+        // Tính ngày diễn ra lần đầu tiên
+        let days_offset = (schedule_item.start_week - 1) * 7 + (schedule_item.day - 2);
+        let event_date = academic_year_start_date + chrono::Duration::days(days_offset as i64);
 
-            if let (Some(start_time), Some(end_time)) = (
-                period_start_times.get(&schedule_item.start_period),
-                period_end_times.get(&schedule_item.end_period),
-            ) {
-                let start_datetime = Ho_Chi_Minh
-                    .from_local_datetime(&event_date.and_time(*start_time))
-                    .unwrap();
-                let end_datetime = Ho_Chi_Minh
-                    .from_local_datetime(&event_date.and_time(*end_time))
-                    .unwrap();
+        // Lấy thời gian bắt đầu và kết thúc
+        if let (Some(start_time), Some(end_time)) = (
+            period_start_times.get(&schedule_item.start_period),
+            period_end_times.get(&schedule_item.end_period),
+        ) {
+            let start_datetime = Ho_Chi_Minh
+                .from_local_datetime(&event_date.and_time(*start_time))
+                .unwrap();
+            let end_datetime = Ho_Chi_Minh
+                .from_local_datetime(&event_date.and_time(*end_time))
+                .unwrap();
 
-                let event = Event::new()
-                    .summary(&schedule_item.subject)
-                    .description(&format!(
-                        "Mã HP: {}\nGV: {}\nPhòng: {}",
-                        schedule_item.class_id, schedule_item.teacher, schedule_item.room
-                    ))
-                    .location(&schedule_item.room)
-                    .starts(icalendar::CalendarDateTime::from(
-                        start_datetime.with_timezone(&chrono::Utc),
-                    ))
-                    .ends(icalendar::CalendarDateTime::from(
-                        end_datetime.with_timezone(&chrono::Utc),
-                    ))
-                    .status(icalendar::EventStatus::Confirmed)
-                    .done();
+            let byday = match schedule_item.day {
+                2 => "MO",
+                3 => "TU",
+                4 => "WE",
+                5 => "TH",
+                6 => "FR",
+                7 => "SA",
+                8 => "SU",
+                _ => continue,
+            };
 
-                calendar.push(event);
-            }
+            let repeat_count = schedule_item.end_week - schedule_item.start_week + 1;
+
+            // Tạo sự kiện có lặp lại
+            let event = Event::new()
+                .summary(&schedule_item.subject)
+                .description(&format!(
+                    "Mã HP: {}\nGV: {}\nPhòng: {}",
+                    schedule_item.class_id, schedule_item.teacher, schedule_item.room
+                ))
+                .location(&schedule_item.room)
+                .starts(icalendar::CalendarDateTime::from(
+                    start_datetime.with_timezone(&chrono::Utc),
+                ))
+                .ends(icalendar::CalendarDateTime::from(
+                    end_datetime.with_timezone(&chrono::Utc),
+                ))
+                .add_property(
+                    "RRULE",
+                    &format!("FREQ=WEEKLY;COUNT={};BYDAY={}", repeat_count, byday),
+                )
+                .status(icalendar::EventStatus::Confirmed)
+                .done();
+
+            calendar.push(event);
         }
     }
+
     output_path.push("ics_download.ics");
     let mut file = File::create(output_path)?;
-
     write!(file, "{}", calendar)?;
 
     Ok(())
