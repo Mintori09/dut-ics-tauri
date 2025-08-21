@@ -1,31 +1,21 @@
-import { AppBar, Toolbar, Typography } from "@mui/material"
-import sizeConfigs from "../../configs/sizeConfigs"
-import colorConfigs from "../../configs/colorConfigs"
+import sizeConfigs from "../../configs/sizeConfigs";
+import colorConfigs from "../../configs/colorConfigs";
 
 const Topbar = () => {
-    return (
-        <AppBar
-            position="fixed"
-            sx={{
-                width: `calc(100% - ${sizeConfigs.sidebar.width})`,
-                ml: sizeConfigs.sidebar.width,
-                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                backgroundColor: colorConfigs.topbar.bg,
-                color: colorConfigs.topbar.color,
-                borderRadius: "8px",
-                backgroundImage: "linear-gradient(to right, #f0f4c3, #dce775)"
-            }}
-        >
-            <Toolbar>
-                <Typography variant="h6" sx={{
-                    fontWeight: "bold",
-                    fontSize: "1.2rem"
-                }}>
-                    React sidebar
-                </Typography>
-            </Toolbar>
-        </AppBar>
-    )
-}
+  return (
+    <div
+      className="fixed top-0 right-0 h-14 flex items-center px-4 shadow-md rounded-lg"
+      style={{
+        width: `calc(100% - ${sizeConfigs.sidebar.width})`,
+        marginLeft: sizeConfigs.sidebar.width,
+        backgroundColor: colorConfigs.topbar.bg,
+        color: colorConfigs.topbar.color,
+        backgroundImage: "linear-gradient(to right, #f0f4c3, #dce775)",
+      }}
+    >
+      <h1 className="font-bold text-lg">React sidebar</h1>
+    </div>
+  );
+};
 
-export default Topbar
+export default Topbar;

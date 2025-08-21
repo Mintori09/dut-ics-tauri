@@ -1,79 +1,49 @@
-import {
-    Box,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-} from "@mui/material";
-import { SelectType } from "../hooks/useSemesters";
 import { useState } from "react";
+import type { SelectType } from "../hooks/useSemesters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 interface Props {
-    semesters: SelectType[];
-    setSemesters: (semesters: SelectType[]) => void
+  semesters: SelectType[];
+  setSemesters: (semesters: SelectType[]) => void;
 }
 
 export default function SemesterList({ semesters, setSemesters }: Props) {
-    if (!semesters || semesters.length === 0) return null;
+  if (!semesters || semesters.length === 0) return null;
 
-    const [selected, setSelected] = useState(
-        semesters.find((s) => s.selected)?.value || ""
-    );
+  const [selected, setSelected] = useState(
+    semesters.find((s) => s.selected)?.value || "",
+  );
 
-    const handleChange = (event: SelectChangeEvent) => {
-        const newValue = event.target.value;
+  const handleChange = (newValue: string) => {
+    setSelected(newValue);
+    const updatedSemesters = semesters.map((s) => ({
+      ...s,
+      selected: s.value === newValue,
+    }));
+    setSemesters(updatedSemesters);
+    console.log("Học kỳ được chọn:", newValue);
+  };
 
-        setSelected(newValue);
-
-        const updatedSemesters = semesters.map((s) => ({
-            ...s,
-            selected: s.value === newValue,
-        }));
-
-        setSemesters(updatedSemesters);
-
-        console.log("Học kỳ được chọn:", newValue);
-    };
-
-    return (
-        <Box
-            sx={{
-                width: "fit-content",
-                minWidth: 180,
-                p: 1.5,
-                border: "1px solid #ddd",
-                backgroundColor: "#fafafa",
-                mb: 2,
-                borderRadius: 3,
-            }}
-        >
-
-            <FormControl fullWidth size="small" className="rounded-ee-md">
-                <InputLabel id="semesters-select-label">Học kỳ</InputLabel>
-                <Select
-                    labelId="semesters-select-label"
-                    id="semesters-select"
-                    label="Học kỳ"
-                    value={selected}
-                    onChange={handleChange}
-                    sx={{
-                        borderRadius: 1,
-                        fontSize: "0.875rem",
-                        backgroundColor: "white",
-                    }}
-                >
-                    {semesters.map((semester) => (
-                        <MenuItem
-                            key={semester.value}
-                            value={semester.value}
-                            sx={{ fontSize: "0.85rem" }}
-                        >
-                            {semester.text}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-        </Box>
-    );
+  return (
+    <div className="w-fit min-w-[180px] p-3 border rounded-xl bg-gray-50 mb-4">
+      <Select value={selected} onValueChange={handleChange}>
+        <SelectTrigger className="text-sm bg-white">
+          <SelectValue placeholder="Học kỳ" />
+        </SelectTrigger>
+        <SelectContent>
+          {semesters.map((semester) => (
+            <SelectItem key={semester.value} value={semester.value}>
+              {semester.text}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }
