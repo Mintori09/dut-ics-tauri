@@ -1,47 +1,45 @@
-import { RouteType } from "../../routes/config"
-import { ListItemButton, ListItemIcon } from "@mui/material"
-import { Link } from "react-router-dom"
-import colorConfigs from "../../configs/colorConfigs"
-import { useSelector } from "react-redux"
-import { RootState } from "../../redux/store"
+import { RouteType } from "../../routes/config";
+import { Button } from "../../components/ui/button";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { cn } from "../../lib/utils";
 
 type Props = {
-    item: RouteType
-}
+  item: RouteType;
+  collapsed?: boolean;
+};
 
-const SidebarItem = ({ item }: Props) => {
-    const { appState } = useSelector((state: RootState) => state.appState)
-    return (
-        item.props && item.path ? (
-            <ListItemButton
-                component={Link}
-                to={item.path}
-                sx={{
-                    display: "flex",
-                    mx: "5%",
-                    borderRadius: "8px",
-                    backgroundColor: appState === item.state
-                        ? colorConfigs.sidebar.activeBg
-                        : "unset",
-                    transition: "background-color 0.2s ease-in-out, transform 0.2s ease-in-out",
-                    "&:hover": {
-                        backgroundColor: colorConfigs.sidebar.hoverBg,
-                        transform: "scale(1.05)"
-                    }
-                }}
-            >
-                {item.props.icon && <ListItemIcon
-                    sx={{
-                        color: colorConfigs.sidebar.color
-                    }}
-                >
-                    {item.props.icon}
-                </ListItemIcon>}
-                {item.props.displayText}
-            </ListItemButton >
+const SidebarItem = ({ item, collapsed }: Props) => {
+  const { appState } = useSelector((state: RootState) => state.appState);
 
-        ) : null
-    )
-}
+  if (!item.props || !item.path) return null;
 
-export default SidebarItem
+  const isActive = appState === item.state;
+
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      className={cn(
+        "w-full justify-start px-3 py-2 my-1 rounded-md transition-all duration-200",
+        "hover:scale-105 hover:bg-muted",
+        isActive && "bg-muted font-medium shadow-sm",
+        collapsed ? "justify-center px-2" : "justify-start",
+      )}
+    >
+      <Link to={item.path}>
+        {/* icon */}
+        {item.props.icon && (
+          <span className={cn("mr-2 flex items-center", collapsed && "mr-0")}>
+            {item.props.icon}
+          </span>
+        )}
+        {/* text */}
+        {!collapsed && item.props.displayText}
+      </Link>
+    </Button>
+  );
+};
+
+export default SidebarItem;

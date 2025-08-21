@@ -1,83 +1,81 @@
-import { useEffect, useState } from "react"
-import { RouteType } from "../../routes/config"
-import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material"
-import { Link } from "react-router-dom"
-import colorConfigs from "../../configs/colorConfigs"
-import { ExpandLessOutlined, ExpandMoreOutlined } from "@mui/icons-material"
-import SidebarItem from './SidebarItem'
-import { useSelector } from "react-redux"
-import { RootState } from "../../redux/store"
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { RouteType } from "../../routes/config";
+import { Button } from "../../components/ui/button";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { cn } from "../../lib/utils";
+import SidebarItem from "./SidebarItem";
 
 type Props = {
-    item: RouteType
-}
+  item: RouteType;
+  collapsed?: boolean;
+};
 
-const SidebarItemCollapse = ({ item }: Props) => {
-    const [open, setOpen] = useState<boolean>(true)
-    const { appState } = useSelector((state: RootState) => state.appState)
+const SidebarItemCollapse = ({ item, collapsed }: Props) => {
+  const [open, setOpen] = useState<boolean>(false);
+  const { appState } = useSelector((state: RootState) => state.appState);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (appState.includes(item.state)) {
-            setOpen(true)
-        } else {
-            setOpen(false)
-        }
-    }, [appState, item])
+  useEffect(() => {
+    if (appState.includes(item.state)) {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [appState, item]);
 
-    return (
-        item.props && item.path ? (
-            <>
-                <ListItemButton
-                    component={Link}
-                    to={item.path}
-                    onClick={() => setOpen(!open)}
-                    sx={{
-                        "&:hover": {
-                            backgroundColor: colorConfigs.sidebar.hoverBg,
-                            transform: "scale(1.05)"
-                        },
-                        // paddingY: "12px",
-                        paddingX: "24px",
-                        display: "flex",
-                        transition: "background-color 0.2s ease-in-out, transform 0.2s ease-in-out",
-                        borderRadius: "8px",
-                    }}
+  if (!item.props || !item.path) return null;
 
-                >
-                    {item.props.icon && <ListItemIcon
-                        sx={{
-                            color: colorConfigs.sidebar.color
-                        }}
-                    >
-                        {item.props.icon}
-                    </ListItemIcon>}
-                    <ListItemText
-                        disableTypography
-                        primary={
-                            <Typography>
-                                {item.props.displayText}
-                            </Typography>
-                        }
-                    >
-                    </ListItemText>
-                    {open ? <ExpandLessOutlined /> : <ExpandMoreOutlined />}
-                </ListItemButton>
-                <Collapse in={open} timeout="auto">
-                    <List>
-                        {item.child?.map((route, index) => (
-                            route.props ? (
-                                route.child ? (
-                                    <SidebarItemCollapse item={route} key={index} />
-                                ) : (
-                                    <SidebarItem item={route} key={index} />
-                                )
-                            ) : null))}
-                    </List>
-                </Collapse>
-            </>
+  return (
+    <div className="w-full">
+      {/* Parent Item */}
+      <Button
+        variant="ghost"
+        className={cn(
+          "w-full justify-between px-3 py-2 my-1 rounded-md transition-all duration-200",
+          "hover:scale-105 hover:bg-muted",
+          collapsed ? "justify-center px-2" : "justify-between",
+        )}
+        onClick={() => setOpen(!open)}
+      >
+        <div className="flex items-center flex-1">
+          {item.props.icon && (
+            <span className={cn("mr-2", collapsed && "mr-0")}>
+              {item.props.icon}
+            </span>
+          )}
+          {!collapsed && <span>{item.props.displayText}</span>}
+        </div>
+        {!collapsed && (open ? <ChevronDown /> : <ChevronRight />)}
+      </Button>
 
-        ) : null
-    )
-}
+      {/* Collapse Children */}
+      <div
+        ref={contentRef}
+        className={cn(
+          "overflow-hidden transition-[max-height] duration-300 ease-in-out ml-4 border-l pl-2",
+          open ? "max-h-[500px]" : "max-h-0",
+        )}
+      >
+        {item.child?.map((route, index) =>
+          route.props ? (
+            route.child ? (
+              <SidebarItemCollapse
+                item={route}
+                key={index}
+                collapsed={collapsed}
+              />
+            ) : (
+              <SidebarItem item={route} key={index} collapsed={collapsed} />
+            )
+          ) : null,
+        )}
+      </div>
+    </div>
+  );
+};
 
-export default SidebarItemCollapse
+export default SidebarItemCollapse;
