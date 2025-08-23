@@ -3,7 +3,7 @@ const sizeConfigs = {
     width: "250px",
     font: {
       fontFamily: "JetBrains Mono",
-      fontWeight: 700,
+      fontWeight: 500,
     },
   },
 };

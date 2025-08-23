@@ -1,40 +1,25 @@
-import "./SchedulePage.css";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import removeSVMainMenu from "./components/removeElement";
 import Spinner from "../../components/common/Spinner";
-import parseSemesters, { SelectType } from "./hooks/useSemesters"; // Đổi tên nếu không phải hook
+import parseSemesters, { SelectType } from "./hooks/useSemesters";
 import SemesterList from "./components/SemesterList";
-import { Course, tableToJson } from "../../types/Course";
-import { open } from "@tauri-apps/plugin-dialog";
+import { Course, Examination } from "../../types/Course";
 import { Button } from "../../components/ui/button";
+import { selectDirectory } from "../../utils/selectDiretory";
+import { Calendar } from "lucide-react";
+import { CourseTable } from "./components/CourseTable";
+import { ExaminationTable } from "./components/ExamTable";
+import { parseStudySchedule } from "./utils/parseStudySchedule";
+import { parseExamSchedule } from "./utils/parseExamSchedule";
 
-type Props = {
-  courses: Course[];
-  path: string;
-};
-
+// ---------------- Page Component ----------------
 export default function SchedulePage() {
-  const [html, setHtml] = useState<string>("");
+  const [studySchedule, setStudySchedule] = useState<Course[]>([]);
+  const [examSchedule, setExamSchedule] = useState<Examination[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [semesters, setSemesters] = useState<SelectType[] | undefined>(
-    undefined,
-  );
-
-  async function selectDirectory(): Promise<string | undefined> {
-    const dir = await open({
-      directory: true,
-      multiple: false,
-    });
-
-    if (dir && typeof dir === "string") {
-      return dir;
-    } else {
-      console.warn("Directory not selected.");
-      return undefined;
-    }
-  }
+  const [semesters, setSemesters] = useState<SelectType[]>([]);
 
   const generateCookie = async () => {
     try {
@@ -53,7 +38,9 @@ export default function SchedulePage() {
       setSemesters(parsedSemesters);
 
       const cleanHtml = removeSVMainMenu(htmlRaw);
-      setHtml(cleanHtml);
+      setStudySchedule(parseStudySchedule(cleanHtml));
+      setExamSchedule(parseExamSchedule(cleanHtml));
+
       setRetryCount(0);
     } catch (err) {
       if (retryCount < 1) {
@@ -63,9 +50,6 @@ export default function SchedulePage() {
         await init();
       } else {
         console.error("❌ Failed after retry:", err);
-        setHtml(
-          "<p style='color:red'>❌ Failed to fetch HTML content after retry.</p>",
-        );
       }
     } finally {
       setIsLoading(false);
@@ -77,12 +61,12 @@ export default function SchedulePage() {
       setIsLoading(true);
       const htmlRaw = await invoke<string>("fetch_schedule_by_id", { id });
       const cleanHtml = removeSVMainMenu(htmlRaw);
-      setHtml(cleanHtml);
+      setStudySchedule(parseStudySchedule(cleanHtml));
+      setExamSchedule(parseExamSchedule(cleanHtml));
     } catch (error) {
       console.error("❌ Failed to fetch schedule by ID:", error);
-      setHtml(
-        "<p style='color:red'>❌ Failed to fetch schedule for selected semester.</p>",
-      );
+      setStudySchedule([]);
+      setExamSchedule([]);
     } finally {
       setIsLoading(false);
     }
@@ -91,22 +75,13 @@ export default function SchedulePage() {
   const handleExportToICS = async () => {
     try {
       setIsLoading(true);
-      console.log("mint");
-
-      const courses: Course[] = tableToJson();
       const path = await selectDirectory();
-
       if (!path) {
         console.log("No path selected");
         return;
       }
 
-      const payload: Props = {
-        courses,
-        path,
-      };
-      console.log(courses);
-
+      const payload = { courses: studySchedule, path };
       await invoke("convert_schedule_to_ics", { payload });
       alert("Successfully exported ICS");
     } catch (error) {
@@ -130,20 +105,26 @@ export default function SchedulePage() {
   return isLoading ? (
     <Spinner />
   ) : (
-    <div style={{ padding: "1rem", fontFamily: "sans-serif" }}>
-      <h2 className="font-bold text-2xl">
+    <div className="w-full font-sans bg-white">
+      <h2 className="font-bold text-2xl flex items-center gap-2">
+        <Calendar className="w-6 h-6 text-blue-500" />
         Lịch học, lịch thi cuối kỳ, lịch khảo sát ý kiến
       </h2>
+
       <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
         <SemesterList semesters={semesters ?? []} setSemesters={setSemesters} />
-        <Button variant="outline" color="inherit" onClick={handleExportToICS}>
+        <Button variant="outline" onClick={handleExportToICS}>
           Xuất file .ICS
         </Button>
       </div>
-      <div
-        style={{ border: "1px solid #ccc", padding: "1rem", marginTop: "1rem" }}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+
+      <div className="mt-6">
+        <h3 className="font-bold text-lg mb-2">📘 Lịch học</h3>
+        <CourseTable courses={studySchedule} />
+
+        <h3 className="font-bold text-lg mt-6 mb-2">📝 Lịch thi</h3>
+        <ExaminationTable exams={examSchedule} />
+      </div>
     </div>
   );
 }

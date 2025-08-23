@@ -34,10 +34,11 @@ const SidebarItemCollapse = ({ item, collapsed }: Props) => {
       {/* Parent Item */}
       <Button
         variant="ghost"
+        style={{ fontFamily: "SF Pro Display" }}
         className={cn(
-          "w-full justify-between px-3 py-2 my-1 rounded-md transition-all duration-200",
+          "w-full justify-start px-3 py-2 rounded-md transition-all duration-200",
           "hover:scale-105 hover:bg-muted",
-          collapsed ? "justify-center px-2" : "justify-between",
+          collapsed ? "justify-center px-2" : "justify-start",
         )}
         onClick={() => setOpen(!open)}
       >
@@ -47,7 +48,9 @@ const SidebarItemCollapse = ({ item, collapsed }: Props) => {
               {item.props.icon}
             </span>
           )}
-          {!collapsed && <span>{item.props.displayText}</span>}
+          {!collapsed && (
+            <span className="ml-1.5">{item.props.displayText}</span>
+          )}
         </div>
         {!collapsed && (open ? <ChevronDown /> : <ChevronRight />)}
       </Button>

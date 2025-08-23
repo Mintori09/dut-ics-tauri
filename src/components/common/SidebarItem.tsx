@@ -21,10 +21,11 @@ const SidebarItem = ({ item, collapsed }: Props) => {
     <Button
       asChild
       variant="ghost"
+      style={{ fontFamily: "SF Pro Display" }}
       className={cn(
-        "w-full justify-start px-3 py-2 my-1 rounded-md transition-all duration-200",
+        "w-full justify-start px-3 py-2 rounded-md transition-all duration-200",
         "hover:scale-105 hover:bg-muted",
-        isActive && "bg-muted font-medium shadow-sm",
+        isActive && "bg-gray-300 font-medium shadow-sm",
         collapsed ? "justify-center px-2" : "justify-start",
       )}
     >

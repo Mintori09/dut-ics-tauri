@@ -1,24 +1,19 @@
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarGroup,
   SidebarFooter,
   SidebarMenu,
 } from "../../components/ui/sidebar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../components/ui/tooltip";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { mainLayout } from "../../routes/appRoutes";
 import SidebarItem from "./SidebarItem";
 import SidebarItemCollapse from "./SidebarItemCollapse";
 import { Button } from "../ui/button";
+import { useEffect } from "react";
 
 type Props = {
   collapsed: boolean;
@@ -26,38 +21,36 @@ type Props = {
 };
 
 export default function AppSidebar({ collapsed, setCollapsed }: Props) {
+  // Chỉ chạy một lần khi load
+  useEffect(() => {
+    const minimizeSidebar = async () => {
+      const size = await getCurrentWindow().innerSize();
+      if (size.width < 1000) {
+        setCollapsed(true); // auto collapse khi màn nhỏ
+      }
+    };
+    minimizeSidebar();
+  }, [setCollapsed]);
+
   return (
     <SidebarProvider>
       <Sidebar
         className={cn(
-          "border-r shadow-sm transition-all duration-300 flex flex-col",
+          "border-r shadow-sm transition-all duration-300 flex flex-col h-full",
           collapsed ? "w-[60px]" : "w-64",
         )}
       >
-        {/* Header */}
-        <SidebarHeader className="flex items-center justify-between p-2">
-          {/* {!collapsed && ( */}
-          {/* <Avatar className="h-8 w-8"> */}
-          {/*   <img src={assets.images.logo} alt="Logo" /> */}
-          {/* </Avatar> */}
-          {/* )} */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setCollapsed(!collapsed)}
-                >
-                  {collapsed ? <ChevronRight /> : <ChevronLeft />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {collapsed ? "Expand" : "Collapse"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </SidebarHeader>
+        {/* Header toggle */}
+        <div className="flex justify-end p-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </Button>
+        </div>
 
         {/* Content */}
         <SidebarContent>
