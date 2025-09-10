@@ -33,12 +33,14 @@ export default function AppSidebar({ collapsed, setCollapsed }: Props) {
   }, [setCollapsed]);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <Sidebar
         className={cn(
-          "border-r shadow-sm transition-all duration-300 flex flex-col h-full",
-          collapsed ? "w-[60px]" : "w-64",
+          "border-r shadow-sm transition-all duration-300 flex flex-col h-full fixed left-0 top-0 z-40",
+          collapsed ? "w-[50px]" : "w-50",
         )}
+        // 👇 disable responsive behavior
+        collapsible="none"
       >
         {/* Header toggle */}
         <div className="flex justify-end p-2">

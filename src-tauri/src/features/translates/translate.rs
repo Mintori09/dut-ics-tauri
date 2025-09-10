@@ -84,7 +84,7 @@ pub async fn translate_text_file(
         if let Ok(Some(translated)) = result {
             translated_text.push(translated);
         } else {
-            translated_text.push(String::from("")); // fallback nếu panic hoặc lỗi khác
+            translated_text.push(String::from(""));
         }
     }
 
@@ -100,8 +100,12 @@ pub async fn translate_srt_file(
     from: &str,
     to: &str,
 ) -> Result<(), String> {
+    println!("{:?}", output_path);
     let input = fs::read_to_string(input_path).map_err(|e| e.to_string())?;
     let blocks = Subtitles::parse_from_str(input).map_err(|e| e.to_string())?;
+    for sub in &blocks {
+        println!("{}", sub);
+    }
 
     let semaphore = Arc::new(Semaphore::new(5));
     let mut tasks = Vec::new();
@@ -165,10 +169,12 @@ async fn translate_file(
 ) -> Result<String, String> {
     match detect_file_extension(&input_path) {
         FileType::Srt => {
-            translate_srt_file(&input_path, &output_path, &from, &to).await?;
+            println!("Started translate srt file!: {}", input_path);
+            translate_text_file(&input_path, &output_path, &from, &to).await?;
             Ok(format!("✅ Translated .srt file saved to {}", output_path))
         }
         FileType::Text => {
+            println!("Started translate text file!");
             translate_text_file(&input_path, &output_path, &from, &to).await?;
             Ok(format!("✅ Translated text file saved to {}", output_path))
         }

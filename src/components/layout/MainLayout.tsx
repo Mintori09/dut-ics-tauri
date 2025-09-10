@@ -1,5 +1,4 @@
 import SideBar from "../common/app-sidebar";
-import colorConfigs from "../../configs/colorConfigs";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
@@ -9,7 +8,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      if (window.innerWidth < 1000) {
         setCollapsed(true); // tự động ẩn khi nhỏ
       } else {
         setCollapsed(false); // tự động hiện khi đủ lớn
@@ -26,17 +25,16 @@ const MainLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
       {/* Sidebar */}
-      {!collapsed && (
-        <div className={cn("transition-all duration-300 flex-shrink-0 w-64")}>
-          <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
-        </div>
-      )}
-
-      {/* Main content */}
-      <main
-        className="flex-1 min-h-screen m-2 rounded-lg shadow p-4 transition-all duration-300"
-        style={{ backgroundColor: colorConfigs.mainBg }}
+      <div
+        className={cn(
+          "transition-all duration-300 flex-shrink-0 ",
+          collapsed ? "w-[50px]" : "w-50",
+        )}
       >
+        <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
+      </div>
+      {/* Main content */}
+      <main className="flex-1 min-h-screen m-2 rounded-lg shadow p-4 transition-all duration-300">
         <Outlet />
       </main>
     </div>
