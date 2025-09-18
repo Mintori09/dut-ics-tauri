@@ -7,6 +7,8 @@ mod utils;
 mod video;
 use std::env;
 
+use crate::features::pictures::scrape_images::scrape_images;
+use crate::features::pictures::zip_images::zip_images;
 use crate::features::translates::translate::{translate_command, translate_stream_command};
 use crate::video::read_video::duration_videos;
 use config::config_env::set_env_backend;
@@ -22,9 +24,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
+            zip_images,
             convert_schedule_to_ics,
             read_markdown_file,
             translate_stream_command,
+            scrape_images,
             fetch_schedule_by_id,
             duration_videos,
             translate_command,
