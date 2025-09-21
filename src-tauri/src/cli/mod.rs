@@ -7,7 +7,6 @@ use anyhow::{Result, anyhow};
 use clap::Parser;
 use command::Cli;
 use features::{create::cli_create, rclone::upload_and_get_link};
-use std::env;
 
 pub async fn cli() -> Result<()> {
     Cli::init()?; // nếu có

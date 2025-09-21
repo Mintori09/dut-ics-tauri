@@ -1,7 +1,3 @@
-// =====================================================
-// Component: Results grid + header actions
-// =====================================================
-
 import { CheckSquare, Download, Square } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { ImgItem } from "../types/ImgItem";
@@ -15,7 +11,6 @@ import {
 } from "../../../components/ui/dialog";
 import { ImageCard } from "./ImageCard";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDownload } from "../hooks/useDownload";
 
 type Props = {
     images: ImgItem[];
@@ -23,6 +18,7 @@ type Props = {
     selectedMap: Record<string, boolean>;
     setSelectedMap: (updater: (prev: Record<string, boolean>) => Record<string, boolean>) => void;
     onDownload: () => void;
+    onZip: () => void;
 };
 
 export function ResultsSection({
@@ -30,12 +26,11 @@ export function ResultsSection({
     selectedCount,
     selectedMap,
     setSelectedMap,
+    onZip,
     onDownload,
 }: Props) {
-    // Ảnh đang mở trong Dialog (dùng URL làm id)
     const [openImageUrl, setOpenImageUrl] = useState<string | null>(null);
 
-    // Map nhanh để tìm index theo url (phục vụ điều hướng)
     const indexByUrl = useMemo(() => {
         const m = new Map<string, number>();
         images.forEach((img, i) => m.set(img.url, i));
@@ -48,7 +43,6 @@ export function ResultsSection({
         return i == null ? null : images[i];
     }, [openImageUrl, indexByUrl, images]);
 
-    // Nếu ảnh đang mở biến mất khỏi danh sách, đóng dialog để tránh trạng thái mồ côi
     useEffect(() => {
         if (openImageUrl && !indexByUrl.has(openImageUrl)) {
             setOpenImageUrl(null);
@@ -81,7 +75,6 @@ export function ResultsSection({
         [go]
     );
 
-    // Chỉ tác động đến các ảnh đang hiển thị, giữ nguyên những url khác trong prev
     const toggleAll = useCallback(
         (val: boolean) => {
             setSelectedMap((prev) => {
@@ -142,9 +135,14 @@ export function ResultsSection({
                             Bỏ chọn
                         </Button>
 
+                        <Button onClick={onZip} disabled={selectedCount === 0} type="button">
+                            <Download className="h-4 w-4 mr-2" />
+                            Nén ZIP
+                        </Button>
+
                         <Button onClick={onDownload} disabled={selectedCount === 0} type="button">
                             <Download className="h-4 w-4 mr-2" />
-                            Tải ZIP
+                            Tải file
                         </Button>
                     </div>
                 </div>
@@ -177,14 +175,14 @@ export function ResultsSection({
                                         />
 
                                         <DialogContent
-                                            className="rounded border p-0 !max-w-none w-screen h-screen sm:w-auto sm:h-auto sm:max-w-[96vw] sm:max-h-[96vh]"
+                                            className="rounded-2xl border p-0 !max-w-none w-screen h-screen sm:w-auto sm:h-auto sm:max-w-[96vw] sm:max-h-[96vh] "
                                             onKeyDown={onDialogKeyDown}
                                         >
                                             <DialogTitle className="sr-only">Xem trước ảnh</DialogTitle>
 
-                                            <div className="relative w-full h-full sm:w-[96vw] sm:h-[96vh]">
-                                                {/* vùng xem: canh giữa + nền tối */}
-                                                <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                                            <div className="relative w-full h-full sm:w-[96vw] sm:h-[96vh] rounded-2xl overflow-hidden">
+                                                {/* vùng xem ảnh */}
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 ">
                                                     <img
                                                         src={currentImg?.url ?? img.url}
                                                         alt={
@@ -199,11 +197,14 @@ export function ResultsSection({
                                                 </div>
 
                                                 {/* overlay thông tin */}
-                                                <div className="absolute bottom-0 left-0 right-0 p-3 text-xs text-white flex justify-between gap-3">
-                                                    <span className="truncate" title={currentImg?.url ?? img.url}>
+                                                <div className="absolute bottom-0 left-0 right-0 p-3 text-xs text-black flex justify-between gap-3 bg-black/30">
+                                                    <span
+                                                        className="truncate font-semibold "
+                                                        title={currentImg?.url ?? img.url}
+                                                    >
                                                         {currentImg?.url ?? img.url}
                                                     </span>
-                                                    <span>
+                                                    <span className="font-semibold ">
                                                         {(currentImg?.w ?? img.w)}×{currentImg?.h ?? img.h}
                                                         {(currentImg?.type ?? img.type) ? ` • ${currentImg?.type ?? img.type}` : ""}
                                                     </span>

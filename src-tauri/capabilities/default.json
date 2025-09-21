@@ -6,6 +6,7 @@
         "main"
     ],
     "permissions": [
+    "notification:default",
         "core:default",
         "core:window:default",
         "core:window:allow-start-dragging",

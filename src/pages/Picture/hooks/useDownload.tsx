@@ -1,7 +1,9 @@
 // src/pages/Picture/hooks/useDownload.ts
 import { invoke } from "@tauri-apps/api/core";
+import { downloadDir, join } from "@tauri-apps/api/path";
 import { save } from "@tauri-apps/plugin-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 
 export type ZipItemResult = {
     url: string;
@@ -10,69 +12,43 @@ export type ZipItemResult = {
     error?: string | null;
 };
 
-export function useDownload(selectedMap: Record<string, boolean>) {
+export function useZip(selectedMap: Record<string, boolean>) {
     const [isDownloading, setIsDownloading] = useState(false);
+    useEffect(() => {
+        const permission = async () => {
+            let permissionGranted = await isPermissionGranted();
+            if (!permissionGranted) {
+                const permission = await requestPermission();
+                permissionGranted = permission === 'granted';
+            }
+        }
+        permission()
+    }, [])
 
-    async function download(): Promise<{
-        destPath?: string;
-        results?: ZipItemResult[];
-        error?: string;
-    }> {
+    async function download() {
         const urls = Object.entries(selectedMap)
             .filter(([, v]) => v)
             .map(([url]) => url);
-
-        if (urls.length === 0) {
-            return { error: "No images selected" };
-        }
+        if (urls.length === 0) return { error: "No images selected" };
 
         const ts = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
 
-        // Đừng đặt biến tên 'save' để tránh shadow với hàm save()
         const destPath = await save({
             title: "Save images as ZIP",
             filters: [{ name: "ZIP archive", extensions: ["zip"] }],
             defaultPath: `images-${ts}.zip`,
         });
-
-        if (!destPath || typeof destPath !== "string") {
-            // user cancel
-            return {};
-        }
+        if (!destPath || typeof destPath !== "string") return {}; // user cancelled
 
         setIsDownloading(true);
         try {
-            // Khai báo generic cho invoke để results có type rõ ràng
             const results = await invoke<ZipItemResult[]>("zip_images", {
                 urls,
-                destPath: destPath, // phải trùng tên tham số Rust
+                destPath,
             });
-
-            // Ví dụ: nếu bạn vẫn muốn alert đơn giản:
-            const ok = results.filter((r: ZipItemResult) => r.ok).length;
-            const fail = results.length - ok;
-            if (ok > 0) {
-                // eslint-disable-next-line no-alert
-                alert(`✅ Zipped ${ok}/${results.length} images to:\n${destPath}`);
-            }
-            if (fail > 0) {
-                const sample = results.filter((r: ZipItemResult) => !r.ok).slice(0, 5);
-                const details = sample
-                    .map(
-                        (r: ZipItemResult) =>
-                            `- ${r.file_name || r.url} → ${r.error || "unknown error"}`
-                    )
-                    .join("\n");
-                // eslint-disable-next-line no-alert
-                alert(`⚠️ ${fail} failed.\n${details}${fail > 5 ? "\n..." : ""}`);
-            }
-
             return { destPath, results };
         } catch (e: unknown) {
-            const msg =
-                e instanceof Error ? e.message : typeof e === "string" ? e : String(e);
-            // eslint-disable-next-line no-alert
-            alert(`❌ ZIP failed: ${msg}`);
+            const msg = e instanceof Error ? e.message : String(e);
             return { destPath, error: msg };
         } finally {
             setIsDownloading(false);
@@ -82,4 +58,49 @@ export function useDownload(selectedMap: Record<string, boolean>) {
     return { isDownloading, download };
 }
 
+export function useDownload(selectedMap: Record<string, boolean>) {
+    const [isDownloading, setIsDownloading] = useState(false);
 
+    async function download() {
+        const urls = Object.entries(selectedMap)
+            .filter(([, v]) => v)
+            .map(([url]) => url);
+
+        if (urls.length === 0) {
+            return { error: "No images selected" };
+        }
+
+        const ts = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
+        const folderName = ts + '-' + sanitizeFolderName(urls[0]);
+        const downloads = await downloadDir();
+        const baseDir = await join(downloads, "mintori-download");
+        const destDir = await join(baseDir, folderName);
+
+        setIsDownloading(true);
+        try {
+            const results = await invoke<ZipItemResult[]>("download_images", {
+                urls,
+                destDir,
+            });
+            const message = "Download thành công\n" + destDir;
+
+            sendNotification({ title: 'Mintori', body: message });
+
+            return { destDir, results };
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e);
+            return { destDir, error: msg };
+        } finally {
+            setIsDownloading(false);
+        }
+    }
+
+    return { isDownloading, download };
+}
+
+function sanitizeFolderName(input: string): string {
+    return input
+        .replace(/(^\w+:|^)\/\//, "") // strip protocol
+        .replace(/[\/\\:?*"<>|]/g, "_") // replace illegal characters
+        .slice(0, 50); // keep folder names reasonable length
+}

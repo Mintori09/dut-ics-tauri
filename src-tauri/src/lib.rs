@@ -7,6 +7,7 @@ mod utils;
 mod video;
 use std::env;
 
+use crate::features::pictures::download_images::download_images;
 use crate::features::pictures::scrape_images::scrape_images;
 use crate::features::pictures::zip_images::zip_images;
 use crate::features::translates::translate::{translate_command, translate_stream_command};
@@ -22,6 +23,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             zip_images,
@@ -34,6 +36,7 @@ pub fn run() {
             translate_command,
             fetch_score,
             create_new_cookie,
+            download_images,
             fetch_schedule
         ])
         .run(tauri::generate_context!())

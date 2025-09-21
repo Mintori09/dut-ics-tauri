@@ -1,12 +1,11 @@
+use crate::cli::utils::hasher::{copy_to_clipboard, hashed_name};
 use anyhow::{Result, anyhow};
-use arboard::Clipboard;
 use std::{ffi::OsStr, path::PathBuf, process::Stdio};
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
     process::Command,
 };
 
-use crate::cli::utils::hasher::{copy_to_clipboard, hashed_name};
 pub async fn run_rclone_command(rclone_command: Vec<&str>, rclone_args: Vec<&str>) -> Result<()> {
     let mut child = Command::new("rclone")
         .args(&rclone_command)
