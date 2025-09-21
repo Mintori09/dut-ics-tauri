@@ -1,5 +1,7 @@
 # My-app
 
+- App for Danang University of Technology
+
 A Tauri application for creating ICS calendar files to import into various calendar applications like Google Calendar, Thunderbird, and Microsoft Outlook.
 
 ## Table of Contents
