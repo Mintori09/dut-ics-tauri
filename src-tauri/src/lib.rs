@@ -12,6 +12,7 @@ use crate::features::pictures::scrape_images::scrape_images;
 use crate::features::pictures::zip_images::zip_images;
 use crate::features::translates::translate::{translate_command, translate_stream_command};
 use crate::video::read_video::duration_videos;
+use crate::video::video_manager::{open_video, read_videos, update_watched};
 use config::config_env::set_env_backend;
 use features::dut_fetch::{create_new_cookie, fetch_schedule, fetch_schedule_by_id, fetch_score};
 use models::course::convert_schedule_to_ics;
@@ -26,6 +27,9 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
+            update_watched,
+            read_videos,
+            open_video,
             zip_images,
             convert_schedule_to_ics,
             read_markdown_file,

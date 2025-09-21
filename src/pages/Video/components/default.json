@@ -1,0 +1,18 @@
+{
+  "course": "Laravel Fundamentals",
+  "sections": [
+    {
+      "id": 18,
+      "name": "Fundamental Middleware",
+      "videos": [
+        {
+          "id": "18-001",
+          "file": "./18 - Fundamental Middleware/001 Introduction Of Middleware.mp4",
+          "title": "Introduction Of Middleware",
+          "watched": false,
+          "last_position": 0
+        }
+      ]
+    }
+  ]
+}

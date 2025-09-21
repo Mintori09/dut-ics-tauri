@@ -9,6 +9,7 @@ import ScorePage from "../pages/Dut/ScorePage";
 import SchedulePage from "../pages/Dut/SchedulePage";
 import HomePage from "../layouts/HomePage";
 import DownloadPicturesPage from "../pages/Picture/pages/DownloadPicturesPage";
+import VideoDetailPage from "../pages/Video/pages/VideoDetailPage";
 
 const mainLayout: RouteType[] = [
     {
@@ -77,6 +78,15 @@ const mainLayout: RouteType[] = [
         props: {
             displayText: "Download",
             icon: <Download className="w-5 h-5" />,
+        },
+    },
+    {
+        element: <VideoDetailPage />,
+        state: "video",
+        path: "/video",
+        props: {
+            displayText: "Video",
+            icon: <Video className="w-5 h-5" />,
         },
     },
 ];
