@@ -1,4 +1,4 @@
-# dut-ics-tauri
+# My-app
 
 A Tauri application for creating ICS calendar files to import into various calendar applications like Google Calendar, Thunderbird, and Microsoft Outlook.
 
@@ -22,6 +22,10 @@ A Tauri application for creating ICS calendar files to import into various calen
 - **Batch Processing**: Import multiple events at once.
 - **Recurring Events**: Support for creating recurring events.
 - **Time Zone Support**: Handle events in different time zones.
+- **DUT Data Fetching**: Fetch academic scores and study schedules from the DUT website.
+- **Image Downloading**: Download multiple images from URLs and save them to a specified directory.
+- **Image Scraping**: Scrape images from web pages.
+- **Image Zipping**: Zip downloaded images into a single archive.
 
 ## Installation
 
