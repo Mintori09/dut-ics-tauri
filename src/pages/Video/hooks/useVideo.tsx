@@ -26,3 +26,5 @@ export function useCourse(jsonPath: string) {
 
   return { course, loading, error, reload: loadCourse };
 }
+
+

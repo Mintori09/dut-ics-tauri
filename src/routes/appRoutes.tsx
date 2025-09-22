@@ -10,6 +10,7 @@ import SchedulePage from "../pages/Dut/SchedulePage";
 import HomePage from "../layouts/HomePage";
 import DownloadPicturesPage from "../pages/Picture/pages/DownloadPicturesPage";
 import VideoDetailPage from "../pages/Video/pages/VideoDetailPage";
+import { VideoManagerPage } from "../pages/Video/pages/VideoManagerPage";
 
 const mainLayout: RouteType[] = [
     {
@@ -82,8 +83,13 @@ const mainLayout: RouteType[] = [
     },
     {
         element: <VideoDetailPage />,
-        state: "video",
-        path: "/video",
+        state: "videos",
+        path: "/videos",
+    },
+    {
+        element: <VideoManagerPage />,
+        state: "courses",
+        path: "/courses",
         props: {
             displayText: "Video",
             icon: <Video className="w-5 h-5" />,

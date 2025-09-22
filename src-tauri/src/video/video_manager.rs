@@ -33,16 +33,30 @@ fn get_course_file() -> PathBuf {
     dir
 }
 
-use std::fs;
+use std::process::Command;
 #[tauri::command]
 pub fn open_video(path: String) -> Result<(), String> {
     println!("Opening video at path: {}", path);
 
-    std::process::Command::new("mpv")
+    #[cfg(target_os = "linux")]
+    let cmd = Command::new("xdg-open")
         .arg(&path)
         .spawn()
-        .map_err(|e| format!("Failed to open {}: {}", path, e))?;
+        .map_err(|e| format!("Failed to open {}: {}", path, e));
 
+    #[cfg(target_os = "macos")]
+    let cmd = Command::new("open")
+        .arg(&path)
+        .spawn()
+        .map_err(|e| format!("Failed to open {}: {}", path, e));
+
+    #[cfg(target_os = "windows")]
+    let cmd = Command::new("cmd")
+        .args(["/C", "start", "", &path])
+        .spawn()
+        .map_err(|e| format!("Failed to open {}: {}", path, e));
+
+    cmd?;
     Ok(())
 }
 

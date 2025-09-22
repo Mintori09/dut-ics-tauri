@@ -3,10 +3,11 @@ import CourseView from "../components/CourseView";
 import SearchBar from "../components/SearchBar";
 import { Section } from "../types/Video";
 import { useCourse } from "../hooks/useVideo";
-
-const JSON_PATH = "/home/mintori/.config/mintori/course/laravel.json";
+import { useLocation } from "react-router-dom";
 
 export default function VideoDetailPage() {
+  const location = useLocation();
+  const { JSON_PATH } = location.state as { JSON_PATH: string };
   const [search, setSearch] = useState("");
   const { course, loading, error } = useCourse(JSON_PATH);
 
